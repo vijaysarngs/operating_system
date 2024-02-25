@@ -1,0 +1,67 @@
+#include <stdio.h>
+
+// Define the process structure
+struct Process {
+    int id;
+    int arrivalTime;
+    int burstTime;
+    int completionTime;
+    int turnaroundTime;
+    int waitingTime;
+    int isCompleted;
+};
+
+// Function to find the process with the shortest burst time
+int shortestJob(struct Process processes[], int n, int time) {
+    int shortest = -1;
+    int shortestBurst = 9999;  // Assuming the shortest burst time to be a large value
+    for (int i = 0; i < n; i++) {
+        if (processes[i].isCompleted == 0 && processes[i].arrivalTime <= time) {
+            if (processes[i].burstTime < shortestBurst) {
+                shortest = i;
+                shortestBurst = processes[i].burstTime;
+            }
+        }
+    }
+    return shortest;
+}
+
+int main() {
+    // Number of processes
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process processes[n];
+
+    // Input process details
+    for (int i = 0; i < n; i++) {
+        processes[i].id = i + 1;
+        printf("Enter arrival time for process %d: ", i + 1);
+        scanf("%d", &processes[i].arrivalTime);
+        printf("Enter burst time for process %d: ", i + 1);
+        scanf("%d", &processes[i].burstTime);
+        processes[i].isCompleted = 0;
+    }
+
+    // Implement the non-preemptive SJF algorithm
+    int time = 0;
+    printf("\nGantt Chart:\n");
+    for (int i = 0; i < n; i++) {
+        int shortestJobIndex = shortestJob(processes, n, time);
+        processes[shortestJobIndex].completionTime = time + processes[shortestJobIndex].burstTime;
+        time = processes[shortestJobIndex].completionTime;
+        processes[shortestJobIndex].turnaroundTime = processes[shortestJobIndex].completionTime - processes[shortestJobIndex].arrivalTime;
+        processes[shortestJobIndex].waitingTime = processes[shortestJobIndex].turnaroundTime - processes[shortestJobIndex].burstTime;
+        processes[shortestJobIndex].isCompleted = 1;
+        printf("%d P%d ", time - processes[shortestJobIndex].burstTime, processes[shortestJobIndex].id);
+    }
+
+    // Display the turnaround time and waiting time for each process
+    printf("\n\nProcess\tTurnaround Time\tWaiting Time\n");
+    for (int i = 0; i < n; i++) {
+        printf("P%d\t%d\t\t%d\n", processes[i].id, processes[i].turnaroundTime, processes[i].waitingTime);
+    }
+
+    return 0;
+}

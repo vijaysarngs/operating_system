@@ -1,0 +1,60 @@
+#include <stdio.h>
+
+// Define the process structure
+struct Process {
+    int id;
+    int priority;
+    int burstTime;
+    int remainingTime;
+};
+
+// Function to find the process with the highest priority
+int highestPriority(struct Process processes[], int n, int time) {
+    int highest = -1;
+    int highestPriority = 9999;  // Assuming the highest priority to be a large value
+    for (int i = 0; i < n; i++) {
+        if (processes[i].remainingTime > 0 && processes[i].priority < highestPriority && processes[i].arrivalTime <= time) {
+            highest = i;
+            highestPriority = processes[i].priority;
+        }
+    }
+    return highest;
+}
+
+int main() {
+    // Number of processes
+    int n;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process processes[n];
+
+    // Input process details
+    for (int i = 0; i < n; i++) {
+        processes[i].id = i + 1;
+        printf("Enter priority for process %d: ", i + 1);
+        scanf("%d", &processes[i].priority);
+        printf("Enter burst time for process %d: ", i + 1);
+        scanf("%d", &processes[i].burstTime);
+        processes[i].remainingTime = processes[i].burstTime;
+    }
+
+    // Implement the pre-emptive priority scheduling logic
+    int time = 0;
+    printf("\nGantt Chart:\n");
+    while (1) {
+        int highestPriorityIndex = highestPriority(processes, n, time);
+        if (highestPriorityIndex == -1) {
+            break;  // No process to execute
+        }
+        printf("%d -> P%d ", time, processes[highestPriorityIndex].id);
+        processes[highestPriorityIndex].remainingTime -= 1;
+        time++;
+
+        if (processes[highestPriorityIndex].remainingTime == 0) {
+            printf("%d\n", time);
+        }
+    }
+
+    return 0;
+}
